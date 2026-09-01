@@ -11,7 +11,21 @@ const getAllStudents = async (req, res) => {
     }
 
 }
+const findStudentById = async (req, res) => {
+    try{
+        const studentCode = req.params.studentCode;
+        const student = await studentService.findStudentById(studentCode);
+        if(student.length === 0){
+            sendResponse(res, 404, false, 'Student not found');
+        }else{
+            sendResponse(res, 200, true, 'Student retrieved successfully', student);
+        }  
+    }catch(error){
+        sendResponse(res, 500, false, error.message);
+    }
+}
 
 module.exports = {
-    getAllStudents
+    getAllStudents,
+    findStudentById
 }
