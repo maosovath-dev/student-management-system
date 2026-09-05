@@ -5,7 +5,7 @@ const getAllStudents = async () => {
   return rows;
 };
 
-const findStudentById = async (studentCode) => {
+const findStudentById = async (id) => {
   const [rows] = await pool.query(` SELECT * FROM students WHERE id = ? `, [
     id,
   ]);
