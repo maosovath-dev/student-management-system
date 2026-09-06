@@ -24,7 +24,6 @@ const findStudentByCode = async (studentCode) => {
 
 const createStudent = async (body) => {
   const arr = [
-    body.user_id || null,
     body.student_code,
     body.first_name,
     body.last_name,
@@ -33,19 +32,27 @@ const createStudent = async (body) => {
     body.phone || null,
     body.address || null,
   ];
-  
+
   const [result] = await pool.query(
-    ` INSERT INTO students ( user_id,
-        student_code,
-        first_name,
-        last_name,
-        gender,
-        date_of_birth,
-        phone,
-        address )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?) `,
-    arr,);
-  return result.insertId;
+    `INSERT INTO students (
+      student_code,
+      first_name,
+      last_name,
+      gender,
+      date_of_birth,
+      phone,
+      address
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    arr
+  );
+
+  const [student] = await pool.query(
+    `SELECT * FROM students WHERE id = ?`,
+    [result.insertId]
+  );
+
+  return student[0];
 };
 
 // ============= Update Student
@@ -61,7 +68,9 @@ const updateStudent = async (id, body) => {
     id,
   ];
 
-  const [result] = await pool.query(` 
+  // 1. ធ្វើការ Update
+  await pool.query(
+    ` 
     UPDATE students 
     SET 
         student_code = ?, 
@@ -72,8 +81,15 @@ const updateStudent = async (id, body) => {
         phone = ?,
         address = ?
     WHERE id = ? 
-    `,arr,);
-  return result;
+    `,
+    arr
+  );
+
+  // 2. ទាញយកទិន្នន័យ Student ដែលបាន Update រួចមកវិញ
+  const [rows] = await pool.query(`SELECT * FROM students WHERE id = ?`, [id]);
+
+  // 3. Return យកតែ Object Student មួយនោះ (rows[0])
+  return rows[0] || null;
 };
 
 // ========= Delete Student
