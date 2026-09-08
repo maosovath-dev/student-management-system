@@ -6,10 +6,15 @@ const router = express.Router();
 const studentController = require('../controllers/student.controller')
 
 router.get('/', studentController.getAllStudents);
+
 router.get('/:id', studentController.getStudentById);
+
 router.get('/student_code/:studentCode',studentController.getStudentByCode);
+
 router.post('/', studentController.createNewStudent);
+
 router.put('/:id', studentController.updateStudent);
+
 router.delete('/:id', studentController.deleteStudent)
 
 // router.post('/', handleUploadImage, studentController.createStudent);

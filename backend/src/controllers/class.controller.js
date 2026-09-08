@@ -1,18 +1,15 @@
 const express = require('express');
 const { sendResponse } = require('../utils/responseHelper');
-
-
+const classServices = require('../services/class.service'); // Added import
 
 const getAllClasses = async (req, res) => {
-    try {
-        const classes = await classServices.getAllClasses();
-        sendResponse(res, 200, true, 'Classes retrieved successfully', classes);
-    } catch (error) {
-        sendResponse(res, 500, false, error.message);
-    }
-
-}
-
+  try {
+    const classes = await classServices.getAllClasses();
+    sendResponse(res, 200, true, 'Classes retrieved successfully', classes);
+  } catch (error) {
+    sendResponse(res, 500, false, error.message);
+  }
+};
 
 const getClassById = async (req, res) => {
   try {
@@ -24,7 +21,6 @@ const getClassById = async (req, res) => {
     }
 
     return sendResponse(res, 200, true, 'Class retrieved successfully', myClass);
-
   } catch (error) {
     return sendResponse(res, 500, false, error.message);
   }
@@ -42,44 +38,34 @@ const createNewClass = async (req, res) => {
 };
 
 const updateClass = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
 
-    try{
-        const { id } = req.params;
-        const body = req.body;
+    const updatedClass = await classServices.updateClass(id, body);
 
-        const updatedClass = await classServices.updateClass(id, body);
-
-        return sendResponse(res, 200, true, 'Class updated successfully', updatedClass);
-
-    }catch(error){
-        return sendResponse(res, 400, false, error.message);
-    }
-}
+    return sendResponse(res, 200, true, 'Class updated successfully', updatedClass);
+  } catch (error) {
+    return sendResponse(res, 400, false, error.message);
+  }
+};
 
 const deleteClass = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-    try{
-        const { id } = req.params;
+    await classServices.deleteClass(id);
 
-        await classServices.deleteClass(id);
-
-        return sendResponse(res, 200, true, 'Class deleted successfully');
-        
-
-    }catch(error){ 
-        return sendResponse(res, 400, false, error.message);
-    }
-}
+    return sendResponse(res, 200, true, 'Class deleted successfully');
+  } catch (error) {
+    return sendResponse(res, 400, false, error.message);
+  }
+};
 
 module.exports = {
-    getAllClasses,
-    getClassById,
-    createNewClass,
-    updateClass,
-    deleteClass
-
-}
-
-
-
-
+  getAllClasses,
+  getClassById,
+  createNewClass,
+  updateClass,
+  deleteClass
+};

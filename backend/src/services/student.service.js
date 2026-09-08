@@ -9,10 +9,6 @@ const getAllStudents = async () => {
 const findStudentById = async (id) => {
     const student = await studentModel.findStudentById(id);
 
-    // if(students.length === 0){
-    //     throw new Error('Student not found!');
-    // }
-
     return student;
     
 };
@@ -55,7 +51,6 @@ const createNewStudent = async (body) => {
     const studentId = await studentModel.createStudent(body);
 
     return studentId;
-
 }
 
 const updateStudent = async (id, body) => {
@@ -90,7 +85,6 @@ const updateStudent = async (id, body) => {
     const result = await studentModel.updateStudent(id, body);
 
     return result;
-
 }
 
 const deleteStudent = async (id) => {
@@ -105,8 +99,6 @@ const deleteStudent = async (id) => {
     const result = await studentModel.deleteStudent(id);
     
     return result;
-
-
 }
 
 module.exports = {
