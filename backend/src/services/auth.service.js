@@ -93,65 +93,34 @@ const createUserByAdmin = async (body) => {
 };
 
 
-// =====================================================
 // VERIFY OTP
-// =====================================================
 
-const verifyEmail = async (
-    email,
-    otpCode
-) => {
+const verifyEmail = async (email, otpCode) => {
 
     if (!email || !otpCode) {
-        throw new Error(
-            "Email and OTP are required"
-        );
+        throw new Error("Email and OTP are required");
     }
-
-
-    const userInfo =
-        await user.findByEmail(email);
-
+    const userInfo = await user.findByEmail(email);
 
     if (!userInfo) {
-        throw new Error(
-            "Email not found"
-        );
+        throw new Error("Email not found");
     }
-
 
     if (userInfo.is_verified) {
-        throw new Error(
-            "Account already verified"
-        );
+        throw new Error("Account already verified");
     }
 
-
-    const otpInfo =
-        await otpModel.findValidOtp(
-            userInfo.id,
-            otpCode,
-            "email_verify"
-        );
-
+    const otpInfo = await otpModel.findValidOtp(userInfo.id, otpCode, "email_verify");
 
     if (!otpInfo) {
-        throw new Error(
-            "Invalid or expired OTP"
-        );
+        throw new Error("Invalid or expired OTP");
     }
 
-
     // Verify account
-    await user.verifyEmail(
-        userInfo.id
-    );
-
+    await user.verifyEmail(userInfo.id);
 
     // Mark OTP used
-    await otpModel.markOtpUsed(
-        otpInfo.id
-    );
+    await otpModel.markOtpUsed(otpInfo.id);
 
 
     // Temporary setup token
@@ -194,69 +163,42 @@ const setPassword = async (
 
     let decoded;
 
-
     try {
 
-        decoded = jwt.verify(
-            setupToken,
-            jwtConfig.secret
-        );
+        decoded = jwt.verify(setupToken, jwtConfig.secret);
 
     } catch (error) {
 
-        throw new Error(
-            "Invalid or expired setup token"
-        );
+        throw new Error("Invalid or expired setup token");
     }
-
 
     if (
-        decoded.purpose !==
-        "set_password"
-    ) {
+        decoded.purpose !== "set_password") {
 
-        throw new Error(
-            "Invalid setup token"
-        );
+        throw new Error("Invalid setup token");
     }
 
 
-    const userInfo =
-        await user.findById(decoded.id);
+    const userInfo = await user.findById(decoded.id);
 
 
     if (!userInfo) {
-        throw new Error(
-            "User not found"
-        );
+        throw new Error("User not found");
     }
 
-
     if (!userInfo.is_verified) {
-        throw new Error(
-            "Please verify OTP first"
-        );
+        throw new Error("Please verify OTP first");
     }
 
 
     // Hash password
-    const hashPassword =
-        await bcrypt.hash(
-            newPassword,
-            10
-        );
-
+    const hashPassword = await bcrypt.hash(newPassword, 10);
 
     // Save password
-    await user.updatePassword(
-        userInfo.id,
-        hashPassword
-    );
-
+    await user.updatePassword(userInfo.id, hashPassword);
 
     return {
-        message:
-            "Password created successfully"
+        message: "Password created successfully"
     };
 };
 
@@ -267,46 +209,26 @@ const setPassword = async (
 
 const login = async (body) => {
 
-    const userInfo =
-        await user.findByEmail(
-            body.email
-        );
-
+    const userInfo = await user.findByEmail(body.email);
 
     if (!userInfo) {
-        throw new Error(
-            "Email or password is invalid"
-        );
+        throw new Error("Email or password is invalid");
     }
-
 
     if (userInfo.status !== "active") {
-        throw new Error(
-            "Your account is inactive"
-        );
+        throw new Error("Your account is inactive");
     }
-
 
     if (!userInfo.is_verified) {
-        throw new Error(
-            "Please verify your account first"
-        );
+        throw new Error("Please verify your account first");
     }
-
 
     if (!userInfo.password) {
-        throw new Error(
-            "Please set your password first"
-        );
+        throw new Error("Please set your password first");
     }
 
-
     // Compare password
-    const isMatch =
-        await bcrypt.compare(
-            body.password,
-            userInfo.password
-        );
+    const isMatch = await bcrypt.compare(body.password, userInfo.password);
 
 
     if (!isMatch) {
@@ -406,7 +328,6 @@ const resendVerifyOTP = async (
         );
     }
 
-
     if (userInfo.is_verified) {
         throw new Error(
             "Account already verified"
@@ -438,10 +359,7 @@ const resendVerifyOTP = async (
     );
 
 
-    await mailService.sendOTPEmail(
-        email,
-        otpCode
-    );
+    await mailService.sendOTPEmail(email, otpCode);
 
 
     return {

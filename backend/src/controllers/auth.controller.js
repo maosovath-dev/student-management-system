@@ -1,14 +1,5 @@
-const authService =
-    require("../services/auth.service");
-
-const {
-    sendResponse
-} = require("../utils/responseHelper");
-
-
-// =====================================================
-// ADMIN CREATE USER
-// =====================================================
+const authService = require("../services/auth.service");
+const { sendResponse } = require("../utils/responseHelper");
 
 const createUserByAdmin = async (req, res) => {
     try {
@@ -22,67 +13,31 @@ const createUserByAdmin = async (req, res) => {
             result
         );
     } catch (error) {
-        console.log(error);
 
-        return sendResponse(
-            res,
-            400,
-            false,
-            error.message
-        );
+        return sendResponse(res, 400, false, error.message);
     }
 };
 
-
-// =====================================================
 // LOGIN
-// =====================================================
 
 const login = async (req, res) => {
     try {
         const result = await authService.login(req.body);
 
-        return sendResponse(
-            res,
-            200,
-            true,
-            "Login successfully",
-            result
-        );
-    } catch (error) {
-        console.log(error);
+        return sendResponse(res, 200, true, "Login successfully", result);
 
-        return sendResponse(
-            res,
-            401,
-            false,
-            error.message
-        );
+    } catch (error) {
+
+        return sendResponse(res, 401, false, error.message);
     }
 };
 
-
-// =====================================================
 // VERIFY EMAIL
-// =====================================================
-
-const verifyEmail =
-    async (req, res) => {
-
+const verifyEmail = async (req, res) => {
     try {
+        const { email, otp } = req.body;
 
-        const {
-            email,
-            otp
-        } = req.body;
-
-
-        const result =
-            await authService.verifyEmail(
-                email,
-                otp
-            );
-
+        const result = await authService.verifyEmail(email, otp);
 
         return sendResponse(
             res,
@@ -90,179 +45,77 @@ const verifyEmail =
             true,
             result.message,
             {
-                setupToken:
-                    result.setupToken
+                setupToken: result.setupToken
             }
         );
 
     } catch (error) {
 
-        console.log(error);
+        return sendResponse(res, 400, false, error.message);
 
-        return sendResponse(
-            res,
-            400,
-            false,
-            error.message
-        );
     }
 };
 
-
-// =====================================================
 // SET PASSWORD
-// =====================================================
 
-const setPassword =
-    async (req, res) => {
-
+const setPassword = async (req, res) => {
     try {
+        const { setupToken, password } = req.body;
 
-        const {
-            setupToken,
-            password
-        } = req.body;
+        const result = await authService.setPassword(setupToken, password);
 
-
-        const result =
-            await authService.setPassword(
-                setupToken,
-                password
-            );
-
-
-        return sendResponse(
-            res,
-            200,
-            true,
-            result.message
-        );
+        return sendResponse(res, 200, true, result.message);
 
     } catch (error) {
 
-        console.log(error);
-
-        return sendResponse(
-            res,
-            400,
-            false,
-            error.message
-        );
+        return sendResponse(res, 400, false, error.message);
     }
 };
 
-
-// =====================================================
 // RESEND OTP
-// =====================================================
 
-const resendVerifyOTP =
-    async (req, res) => {
-
+const resendVerifyOTP = async (req, res) => {
     try {
+        const { email } = req.body;
 
-        const {
-            email
-        } = req.body;
+        const result = await authService.resendVerifyOTP(email);
 
-
-        const result =
-            await authService.resendVerifyOTP(
-                email
-            );
-
-
-        return sendResponse(
-            res,
-            200,
-            true,
-            result.message
-        );
+        return sendResponse(res, 200, true, result.message);
 
     } catch (error) {
-
-        console.log(error);
-
-        return sendResponse(
-            res,
-            400,
-            false,
-            error.message
-        );
+        return sendResponse(res, 400, false, error.message);
     }
 };
 
-
-// =====================================================
 // GET ME
-// =====================================================
 
-const getMe =
-    async (req, res) => {
-
+const getMe = async (req, res) => {
     try {
+        const result = await authService.getMe(req.user.id);
 
-        const result =
-            await authService.getMe(
-                req.user.id
-            );
-
-
-        return sendResponse(
-            res,
-            200,
-            true,
-            "Get profile successfully",
-            result
-        );
+        return sendResponse(res, 200, true, "Get profile successfully", result);
 
     } catch (error) {
 
-        return sendResponse(
-            res,
-            400,
-            false,
-            error.message
-        );
+        return sendResponse(res, 400, false, error.message);
+
     }
 };
 
-
-// =====================================================
 // LOGOUT
-// =====================================================
 
-const logout =
-    async (req, res) => {
-
+const logout = async (req, res) => {
     try {
-
-        const result =
-            await authService.logout(
-                req.user.id
-            );
-
-
-        return sendResponse(
-            res,
-            200,
-            true,
-            result.message
-        );
+        const result = await authService.logout(req.user.id);
+        
+        return sendResponse(res, 200, true, result.message);
 
     } catch (error) {
 
-        console.log(error);
+        return sendResponse(res, 400, false, error.message);
 
-        return sendResponse(
-            res,
-            400,
-            false,
-            error.message
-        );
     }
 };
-
 
 module.exports = {
     createUserByAdmin,
