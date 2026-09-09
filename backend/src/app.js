@@ -15,13 +15,16 @@ const classRoute = require('./routes/class.routes')
 const subjectRoute = require('./routes/subject.route');
 const scoreRoute = require('./routes/score.route');
 const attendanceRoute = require('./routes/attendance.routes');
+const authRoute = require('./routes/auth.route')
 
 
-app.use('/api/student', studentRoute);
-app.use('/api/class', classRoute);
+app.use('/api/students', studentRoute);
+app.use('/api/classes', classRoute);
 app.use('/api/subjects', subjectRoute);
 app.use('/api/scores', scoreRoute);
 app.use('/api/attendance', attendanceRoute);
+app.use('/api/auth', authRoute);
+
 
 // Server
 app.listen(3000, () => {

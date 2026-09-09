@@ -1,9 +1,9 @@
 CREATE DATABASE student_management;
-
 USE student_management;
-select * from students;
-SHOW TABLES;
 
+-- ============================
+-- 1. USERS (Login accounts)
+-- ============================
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -11,7 +11,7 @@ CREATE TABLE users (
 
     email VARCHAR(150) NOT NULL UNIQUE,
 
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NULL,
 
     role ENUM('admin', 'teacher', 'student')
         DEFAULT 'student',
@@ -19,41 +19,35 @@ CREATE TABLE users (
     status ENUM('active', 'inactive')
         DEFAULT 'active',
 
+    is_verified TINYINT(1) NOT NULL DEFAULT 0,
+
+    token TEXT NULL,
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE students (
+
+-- ============================
+-- 2. OTP CODES (Verify email / reset password)
+-- ============================
+CREATE TABLE otp_codes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-
-    student_code VARCHAR(50) NOT NULL UNIQUE,
-
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-
-    gender ENUM('male', 'female', 'other') NOT NULL,
-
-    date_of_birth DATE,
-
-    phone VARCHAR(20),
-
-    address VARCHAR(255),
-
+    user_id INT NOT NULL,
+    otp_code VARCHAR(10) NOT NULL,
+    purpose ENUM('email_verify', 'password_reset', 'login') 
+        DEFAULT 'email_verify',
+    expires_at TIMESTAMP NOT NULL,
+    is_used TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-ALTER TABLE students
-CHANGE COLUMN name first_name VARCHAR(100) NOT NULL;
-
-ALTER TABLE students
-ADD COLUMN last_name VARCHAR(100) NOT NULL
-AFTER first_name;
-
+-- ============================
+-- 3. CLASSES
+-- ============================
 CREATE TABLE classes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -61,6 +55,29 @@ CREATE TABLE classes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ============================
+-- 4. STUDENTS
+-- ============================
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    class_id INT DEFAULT NULL,
+    student_code VARCHAR(50) NOT NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    gender ENUM('male', 'female', 'other') NOT NULL,
+    date_of_birth DATE,
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL
+);
+
+-- ============================
+-- 5. SUBJECTS
+-- ============================
 CREATE TABLE subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -68,6 +85,9 @@ CREATE TABLE subjects (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ============================
+-- 6. SCORES
+-- ============================
 CREATE TABLE scores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
@@ -75,27 +95,21 @@ CREATE TABLE scores (
     score DECIMAL(5,2) NOT NULL,
     semester VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (student_id)
-        REFERENCES students(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    FOREIGN KEY (subject_id)
-        REFERENCES subjects(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- ============================
+-- 7. ATTENDANCE
+-- ============================
 CREATE TABLE attendance (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
+    class_id INT DEFAULT NULL,
     date DATE NOT NULL,
     status ENUM('present', 'absent', 'late') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (student_id)
-        REFERENCES students(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL,
+    UNIQUE KEY unique_daily_attendance (student_id, date)
 );
