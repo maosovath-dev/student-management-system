@@ -22,9 +22,8 @@ const findSubjectById = async (id) => {
         WHERE id = ?
     `, [id]);
 
-    return rows;
+    return rows[0] || null;
 };
-
 
 // Find Subject By Name
 const findSubjectByName = async (name) => {

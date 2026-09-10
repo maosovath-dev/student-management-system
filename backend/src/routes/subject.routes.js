@@ -1,0 +1,62 @@
+const express = require("express");
+
+const router = express.Router();
+
+const classController =
+    require("../controllers/class.controller");
+
+const classSubjectController =
+    require("../controllers/classSubject.controller");
+
+
+// ========================================
+// CLASS ↔ SUBJECT
+// ========================================
+
+router.post(
+    "/:classId/subjects",
+    classSubjectController.assignSubjectToClass
+);
+
+router.get(
+    "/:classId/subjects",
+    classSubjectController.getSubjectsByClass
+);
+
+router.delete(
+    "/:classId/subjects/:subjectId",
+    classSubjectController.removeSubjectFromClass
+);
+
+
+// ========================================
+// CLASS CRUD
+// ========================================
+
+router.get(
+    "/",
+    classController.getAllClasses
+);
+
+router.post(
+    "/",
+    classController.createNewClass
+);
+
+router.get(
+    "/:id",
+    classController.getClassById
+);
+
+router.put(
+    "/:id",
+    classController.updateClass
+);
+
+router.delete(
+    "/:id",
+    classController.deleteClass
+);
+
+
+module.exports = router;
