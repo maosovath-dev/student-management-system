@@ -1,105 +1,88 @@
 const jwt = require("jsonwebtoken");
 
-const jwtConfig =
-    require("../config/jwt");
+const user = require("../models/user.model");
 
-const user =
-    require("../models/user.model");
+const isLogin = async (req, res, next) => {
 
+        try {
 
-const isLogin =
-    async (req, res, next) => {
+            const authHeader = req.headers.authorization;
 
-    try {
+            if (!authHeader) {
 
-        const authHeader =
-            req.headers.authorization;
-
-
-        if (!authHeader) {
-
-            return res.status(401).json({
-                result: false,
-                msg: "You need to login"
-            });
-        }
+                return res.status(401).json({
+                    result: false,
+                    msg: "You need to login"
+                });
+            }
 
 
-        const parts =
-            authHeader.split(" ");
+            const parts =
+                authHeader.split(" ");
 
 
-        if (
-            parts.length !== 2 ||
-            parts[0] !== "Bearer"
-        ) {
+            if (
+                parts.length !== 2 ||
+                parts[0] !== "Bearer"
+            ) {
 
-            return res.status(401).json({
-                result: false,
-                msg: "Invalid authorization header"
-            });
-        }
-
-
-        const token = parts[1];
+                return res.status(401).json({
+                    result: false,
+                    msg: "Invalid authorization header"
+                });
+            }
 
 
-        // Verify JWT
-        const decoded =
-            jwt.verify(
-                token,
-                jwtConfig.secret
-            );
+            const token = parts[1];
 
 
-        // Check token in DB
-        const row =
-            await user.getByToken(
-                token
-            );
+            const decoded =
+                jwt.verify(
+                    token,
+                    process.env.JWT_SECRET
+                );
+
+            const row = await user.getByToken(token);
+
+            if (!row) {
+
+                return res.status(401).json({
+                    result: false,
+                    msg: "Invalid or expired token"
+                });
+            }
 
 
-        if (!row) {
+            if (
+                row.status !== "active"
+            ) {
+
+                return res.status(403).json({
+                    result: false,
+                    msg: "Your account is inactive"
+                });
+            }
+
+
+            req.user = {
+                id: decoded.id,
+                email: decoded.email,
+                role: decoded.role
+            };
+
+
+            next();
+
+        } catch (error) {
+
+            console.log(error);
 
             return res.status(401).json({
                 result: false,
                 msg: "Invalid or expired token"
             });
         }
-
-
-        // Check account status
-        if (
-            row.status !== "active"
-        ) {
-
-            return res.status(403).json({
-                result: false,
-                msg: "Your account is inactive"
-            });
-        }
-
-
-        req.user = {
-            id: decoded.id,
-            email: decoded.email,
-            role: decoded.role
-        };
-
-
-        next();
-
-
-    } catch (error) {
-
-        console.log(error);
-
-        return res.status(401).json({
-            result: false,
-            msg: "Invalid or expired token"
-        });
-    }
-};
+    };
 
 
 module.exports = {
