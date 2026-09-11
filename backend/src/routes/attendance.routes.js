@@ -4,39 +4,54 @@ const router = express.Router();
 
 const attendanceController = require("../controllers/attendance.controller");
 
-// Get All Attendance
+const { isLogin } = require("../middleware/auth.middleware");
+const { allowRoles } = require("../middleware/role.middleware");
+
+// View All Attendance
 router.get(
     "/",
+    isLogin,
+    allowRoles("admin", "teacher"),
     attendanceController.getAllAttendance
 );
 
-// Get Attendance By Student
+// View Attendance By Student
 router.get(
     "/student/:studentId",
+    isLogin,
+    allowRoles("admin", "teacher"),
     attendanceController.getAttendanceByStudent
 );
 
-// Get Attendance By ID
+// View Attendance By ID
 router.get(
     "/:id",
+    isLogin,
+    allowRoles("admin", "teacher"),
     attendanceController.getAttendanceById
 );
 
-// Create Attendance
+// Teacher + Admin can record attendance
 router.post(
     "/",
+    isLogin,
+    allowRoles("admin", "teacher"),
     attendanceController.createAttendance
 );
 
-// Update Attendance
+// Teacher + Admin can correct attendance
 router.put(
     "/:id",
+    isLogin,
+    allowRoles("admin", "teacher"),
     attendanceController.updateAttendance
 );
 
-// Delete Attendance
+// Only Admin can delete
 router.delete(
     "/:id",
+    isLogin,
+    allowRoles("admin"),
     attendanceController.deleteAttendance
 );
 

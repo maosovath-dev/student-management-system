@@ -4,9 +4,8 @@ const router = express.Router();
 
 const authController = require("../controllers/auth.controller");
 
-const {isLogin} = require("../middleware/auth.middleware");
-
-const {allowRoles} = require("../middleware/role.middleware");
+const { isLogin } = require("../middleware/auth.middleware");
+const { allowRoles } = require("../middleware/role.middleware");
 
 
 // ========================================
@@ -19,17 +18,20 @@ router.post(
     authController.login
 );
 
+
 // Verify OTP
 router.post(
     "/verify-email",
     authController.verifyEmail
 );
 
+
 // Resend OTP
 router.post(
     "/resend-otp",
     authController.resendVerifyOTP
 );
+
 
 // Set Password
 router.post(
@@ -39,7 +41,7 @@ router.post(
 
 
 // ========================================
-// ADMIN
+// ADMIN ONLY
 // ========================================
 
 // Admin creates Teacher / Student
@@ -61,6 +63,7 @@ router.get(
     isLogin,
     authController.getMe
 );
+
 
 // Logout
 router.post(

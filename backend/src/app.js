@@ -16,6 +16,7 @@ const subjectRoute = require('./routes/subject.route');
 const scoreRoute = require('./routes/score.route');
 const attendanceRoute = require('./routes/attendance.routes');
 const authRoute = require('./routes/auth.route')
+const profileRoute = require("./routes/profile.route")
 
 
 app.use('/api/students', studentRoute);
@@ -24,6 +25,7 @@ app.use('/api/subjects', subjectRoute);
 app.use('/api/scores', scoreRoute);
 app.use('/api/attendance', attendanceRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/profile', profileRoute);
 
 
 // Server

@@ -12,6 +12,8 @@ const findByEmail = async (email) => {
             role,
             status,
             is_verified,
+            avatar_url,
+            avatar_public_id,
             token,
             created_at,
             updated_at
@@ -20,7 +22,7 @@ const findByEmail = async (email) => {
         [email]
     );
 
-    return rows[0];
+    return rows[0] || null;
 };
 
 
@@ -34,6 +36,8 @@ const findById = async (id) => {
             role,
             status,
             is_verified,
+            avatar_url,
+            avatar_public_id,
             created_at,
             updated_at
         FROM users
@@ -41,7 +45,7 @@ const findById = async (id) => {
         [id]
     );
 
-    return rows[0];
+    return rows[0] || null;
 };
 
 
@@ -72,34 +76,40 @@ const create = async (body) => {
 
 // Update password
 const updatePassword = async (id, password) => {
-    await pool.query(
+    const [result] = await pool.query(
         `UPDATE users
          SET password = ?
          WHERE id = ?`,
         [password, id]
     );
+
+    return result;
 };
 
 
 // Verify email
 const verifyEmail = async (id) => {
-    await pool.query(
+    const [result] = await pool.query(
         `UPDATE users
          SET is_verified = 1
          WHERE id = ?`,
         [id]
     );
+
+    return result;
 };
 
 
 // Save JWT token
 const addToken = async (token, id) => {
-    await pool.query(
+    const [result] = await pool.query(
         `UPDATE users
          SET token = ?
          WHERE id = ?`,
         [token, id]
     );
+
+    return result;
 };
 
 
@@ -113,24 +123,52 @@ const getByToken = async (token) => {
             role,
             status,
             is_verified,
+            avatar_url,
+            avatar_public_id,
             token
         FROM users
         WHERE token = ?`,
         [token]
     );
 
-    return rows[0];
+    return rows[0] || null;
 };
 
 
 // Delete token when logout
 const deleteToken = async (id) => {
-    await pool.query(
+    const [result] = await pool.query(
         `UPDATE users
          SET token = NULL
          WHERE id = ?`,
         [id]
     );
+
+    return result;
+};
+
+
+// Update avatar
+const updateAvatar = async (
+    id,
+    avatarUrl,
+    avatarPublicId
+) => {
+
+    const [result] = await pool.query(
+        `UPDATE users
+         SET
+            avatar_url = ?,
+            avatar_public_id = ?
+         WHERE id = ?`,
+        [
+            avatarUrl,
+            avatarPublicId,
+            id
+        ]
+    );
+
+    return result;
 };
 
 
@@ -142,5 +180,6 @@ module.exports = {
     verifyEmail,
     addToken,
     getByToken,
-    deleteToken
+    deleteToken,
+    updateAvatar
 };

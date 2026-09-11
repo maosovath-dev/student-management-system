@@ -4,18 +4,67 @@ const router = express.Router();
 
 const subjectController = require("../controllers/subject.controller");
 
+const { isLogin } = require("../middleware/auth.middleware");
+const { allowRoles } = require("../middleware/role.middleware");
 
-router.get("/",subjectController.getAllSubjects);
 
-router.get("/:id", subjectController.getSubjectById);
+// ===============================
+// Subject Management
+// ADMIN + TEACHER VIEW
+// ===============================
 
-router.get("/name/:name", subjectController.getSubjectByName);
+// Get All Subjects
+router.get(
+    "/",
+    isLogin,
+    allowRoles("admin", "teacher"),
+    subjectController.getAllSubjects
+);
 
-router.post("/", subjectController.createSubject);
 
-router.put("/:id", subjectController.updateSubject);
+// Get Subject By Name
+router.get(
+    "/name/:name",
+    isLogin,
+    allowRoles("admin", "teacher"),
+    subjectController.getSubjectByName
+);
 
-router.delete("/:id",subjectController.deleteSubject);
+
+// Get Subject By ID
+router.get(
+    "/:id",
+    isLogin,
+    allowRoles("admin", "teacher"),
+    subjectController.getSubjectById
+);
+
+
+// Create Subject - ADMIN ONLY
+router.post(
+    "/",
+    isLogin,
+    allowRoles("admin"),
+    subjectController.createSubject
+);
+
+
+// Update Subject - ADMIN ONLY
+router.put(
+    "/:id",
+    isLogin,
+    allowRoles("admin"),
+    subjectController.updateSubject
+);
+
+
+// Delete Subject - ADMIN ONLY
+router.delete(
+    "/:id",
+    isLogin,
+    allowRoles("admin"),
+    subjectController.deleteSubject
+);
 
 
 module.exports = router;

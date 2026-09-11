@@ -1,27 +1,59 @@
-const express = require('express');
+const express = require("express");
+
 const router = express.Router();
 
-// const handleUploadImage = require('../middlewares/handleImageUpload');
-// const productController = require('../controllers/product.controller');
-const studentController = require('../controllers/student.controller')
+const studentController = require("../controllers/student.controller");
 
-router.get('/', studentController.getAllStudents);
+const { isLogin } = require("../middleware/auth.middleware");
 
-router.get('/:id', studentController.getStudentById);
+const { allowRoles } = require("../middleware/role.middleware");
 
-router.get('/student_code/:studentCode',studentController.getStudentByCode);
 
-router.post('/', studentController.createNewStudent);
+// ===============================
+// Student Management - ADMIN ONLY
+// ===============================
 
-router.put('/:id', studentController.updateStudent);
+router.get(
+    "/",
+    isLogin,
+    allowRoles("admin"),
+    studentController.getAllStudents
+);
 
-router.delete('/:id', studentController.deleteStudent)
+router.get(
+    "/student_code/:studentCode",
+    isLogin,
+    allowRoles("admin"),
+    studentController.getStudentByCode
+);
 
-// router.post('/', handleUploadImage, studentController.createStudent);
-// router.delete('/:id', studentController.deleteStudent);
-// router.put('/:id', handleUploadImage, studentController.updateStudent);
-// router.put('/:id/image', handleUploadImage, studentController.updateStudentImage);
+router.get(
+    "/:id",
+    isLogin,
+    allowRoles("admin"),
+    studentController.getStudentById
+);
 
+router.post(
+    "/",
+    isLogin,
+    allowRoles("admin"),
+    studentController.createNewStudent
+);
+
+router.put(
+    "/:id",
+    isLogin,
+    allowRoles("admin"),
+    studentController.updateStudent
+);
+
+router.delete(
+    "/:id",
+    isLogin,
+    allowRoles("admin"),
+    studentController.deleteStudent
+);
 
 
 module.exports = router;
