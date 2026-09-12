@@ -1,8 +1,26 @@
 const pool = require("../config/db");
 
 const getAllStudents = async () => {
-  const [rows] = await pool.query(` SELECT * FROM students ORDER BY id DESC `);
-  return rows;
+    const [rows] = await pool.query(`
+        SELECT
+            s.id,
+            s.user_id,
+            s.student_code,
+            s.first_name,
+            s.last_name,
+            s.gender,
+            s.date_of_birth,
+            s.phone,
+            s.address,
+            s.class_id,
+            c.name AS class_name
+        FROM students s
+        LEFT JOIN classes c
+            ON s.class_id = c.id
+        ORDER BY s.id DESC
+    `);
+
+    return rows;
 };
 
 const findStudentById = async (id) => {

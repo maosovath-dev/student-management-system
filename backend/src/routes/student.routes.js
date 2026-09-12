@@ -13,10 +13,15 @@ const { allowRoles } = require("../middleware/role.middleware");
 // Student Management - ADMIN ONLY
 // ===============================
 
+// router.get(
+//     "/",
+//     isLogin,
+//     allowRoles("admin"),
+//     studentController.getAllStudents
+// );
+
 router.get(
     "/",
-    isLogin,
-    allowRoles("admin"),
     studentController.getAllStudents
 );
 
